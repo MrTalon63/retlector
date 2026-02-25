@@ -32,6 +32,7 @@ jobs:
               with:
                   file: Dockerfile
                   push: true
+                  platforms: linux/amd64,linux/arm64
                   tags: |
                       ghcr.io/${{ env.IMAGE_NAME }}:latest
                       ghcr.io/${{ env.IMAGE_NAME }}:${{ github.RUN_ID }}
