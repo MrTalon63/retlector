@@ -1,26 +1,6 @@
-import Keyv from "keyv";
-import { KeyvFile } from "keyv-file";
-import winston from "winston";
-
 import index from "./index.html";
-
-const kv = new Keyv({
-	store: new KeyvFile({
-		filename: process.env.KV_FILE || "./data/kv.json",
-		writeDelay: 100,
-	}),
-});
-
-const log = winston.createLogger({
-	level: process.env.LOG_LEVEL || "info",
-	format: winston.format.combine(
-		winston.format.timestamp(),
-		winston.format.printf(({ timestamp, level, message }) => {
-			return `${timestamp} [${level.toUpperCase()}]: ${message}`;
-		}),
-	),
-	transports: [new winston.transports.Console()],
-});
+import kv from "./utils/kv";
+import log from "./utils/logger";
 
 async function fetchTle(group: string) {
 	const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${group}&FORMAT=tle`;
