@@ -6,7 +6,7 @@ import log from "./logger";
 
 let kv: Keyv<any>;
 
-if (process.env.REDIS_URL) {
+if (process.env.REDIS_URI) {
 	log.info("Using Redis for key-value storage.");
 
 	kv = new Keyv({

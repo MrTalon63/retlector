@@ -1,6 +1,7 @@
-import index from "./index.html";
+import index from "./pub/index.html";
 import kv from "./utils/kv";
 import log from "./utils/logger";
+import metrics from "./utils/metrics";
 
 async function fetchTle(group: string) {
 	const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${group}&FORMAT=tle`;
@@ -126,6 +127,18 @@ Bun.serve({
 				return new Response(`Error fetching TLEs for group "${group}": ${error}`, { status: 500, headers: limited.headers });
 			}
 		},
+
+		"/metrics": async (req) => {
+			if (process.env.ENABLE_METRICS !== "true") {
+				return new Response("Metrics collection is disabled.", { status: 404 });
+			}
+
+			const metricsData = await metrics.register.metrics();
+			console.log(await metrics.register);
+			return new Response(metricsData, { headers: { "Content-Type": metrics.prom.register.contentType } });
+		},
+
+		"/*": () => new Response("Not Found", { status: 404 }),
 	},
 });
 
