@@ -10,6 +10,10 @@ Very simple web app to cache and return TLEs from Celestrak, so you can avoid ge
 - Dockerized for easy deployment
 - Light on resources
 
+### Hosted version
+
+ReTLEctor is hosted by me at [retlector.eu](https://retlector.eu) free of charge. While I can't guarantee uptime I will try my best to keep it running as long as I can.
+
 ### Selfhosting
 
 As the application is Dockerized, you can easily run it on your own server or local machine using Docker.
