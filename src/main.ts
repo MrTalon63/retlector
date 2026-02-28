@@ -3,14 +3,24 @@ import { html } from "@elysiajs/html";
 
 import tleRoute from "./routes/tle";
 
-import index from "./pub/index.html";
+import index from "./pub/index.tsx";
+import kv from "./utils/kv";
 import config from "./utils/config";
 import log from "./utils/logger";
 
 new Elysia()
 	// Use HTML plugin for rendering the index page
 	.use(html())
-	.get("/", () => index) // Serve index page
+	.get("/styles.css", () => new Response(Bun.file(new URL("./pub/styles.css", import.meta.url))))
+	.get("/", async () => {
+		const activeGroups = [];
+		for (const group of config.allowedGroups) {
+			const timestamp = await kv.get(`${group}_timestamp`);
+			const lastUpdate = timestamp ? new Date(timestamp).toISOString() : "Never";
+			activeGroups.push({ name: group, lastUpdate });
+		}
+		return index({ activeGroups, cacheDuration: config.cacheDuration, maxReq: config.rateLimitMaxRequests, maxReqWindow: config.rateLimitWindow });
+	})
 
 	// Subroutes registers
 	.use(tleRoute) // Import TLE routes

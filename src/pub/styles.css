@@ -1,0 +1,36 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 16px;
+}
+
+table {
+	border-collapse: collapse;
+	width: 60%;
+}
+
+th,
+td {
+	border: 1px solid #000000;
+	padding: 8px;
+}
+
+tr {
+	background-color: #bebebe;
+	text-align: left;
+}
+
+tr:first-child {
+	background-color: #3c4258;
+	color: #ffffff;
+}
+
+tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+code {
+	background-color: #f4f4f4;
+	padding: 2px 4px;
+	border-radius: 4px;
+	font-family: "Courier New", Courier, monospace;
+}
