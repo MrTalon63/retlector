@@ -16,6 +16,7 @@ new Elysia()
 	.use(html())
 	.get("/styles.css", () => new Response(Bun.file(new URL("./pub/styles.css", import.meta.url)), { headers: { "Content-Type": "text/css", "Cache-Control": "public, max-age=31536000" } }))
 	.get("/favicon.ico", () => new Response(Bun.file(new URL("./pub/favicon.ico", import.meta.url)), { headers: { "Content-Type": "image/x-icon", "Cache-Control": "public, max-age=31536000" } }))
+	.get("/retlector.png", () => new Response(Bun.file(new URL("./pub/retlector.png", import.meta.url)), { headers: { "Content-Type": "image/png", "Cache-Control": "public, max-age=31536000" } }))
 	.get("/", async () => {
 		const activeGroups = [];
 		for (const group of config.allowedGroups) {

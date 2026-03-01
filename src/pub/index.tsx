@@ -10,6 +10,7 @@ const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow }: { activeGr
 			<meta name="theme-color" content="#3c4258" />
 			<meta property="og:title" content="ReTLEctor" />
 			<meta property="og:description" content="Celestrak TLE caching server" />
+			<meta property="og:image" content="https://retlector.eu/retlector.png" />
 			<meta property="og:type" content="website" />
 			<meta name="twitter:card" content="summary" />
 			<meta name="twitter:title" content="ReTLEctor" />
