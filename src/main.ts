@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { html } from "@elysiajs/html";
+import { wrap } from "@bogeychan/elysia-logger";
 
 import tleRoute from "./routes/tle";
 import noradRoute from "./routes/norad";
@@ -10,6 +11,7 @@ import config from "./utils/config";
 import log from "./utils/logger";
 
 new Elysia()
+	.use(wrap(log))
 	// Use HTML plugin for rendering the index page
 	.use(html())
 	.get("/styles.css", () => new Response(Bun.file(new URL("./pub/styles.css", import.meta.url)), { headers: { "Content-Type": "text/css" } }))

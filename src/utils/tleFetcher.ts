@@ -5,7 +5,7 @@ import { version } from "../../package.json";
 
 async function fetchTle(group: string) {
 	const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${group}&FORMAT=tle`;
-	log.info(`Fetching TLEs for group "${group}" from Celestrak...`);
+	log.debug(`Fetching TLEs for group "${group}" from Celestrak...`);
 	try {
 		const lastFetch = await kv.get(`${group}_timestamp`);
 		const response = await fetch(url, {
@@ -20,10 +20,14 @@ async function fetchTle(group: string) {
 		const tleData = await response.text();
 		await kv.set(group, tleData);
 		await kv.set(`${group}_timestamp`, Date.now());
-		log.info(`Successfully cached TLEs for group "${group}".`);
+		log.debug(`Successfully cached TLEs for group "${group}".`);
 		return tleData;
 	} catch (error) {
-		log.error(`Error fetching TLEs for group "${group}": ${error}`);
+		if (error instanceof Error) {
+			log.child(error).error(`Error fetching TLEs for group "${group}":`);
+		} else {
+			log.error(`Error fetching TLEs for group "${group}": ${error}`);
+		}
 		throw error;
 	}
 }

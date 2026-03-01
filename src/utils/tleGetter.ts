@@ -45,7 +45,7 @@ async function getObjectsTle(noradId: number) {
 
 	// If we're here then active group doesn't contain the requested NORAD ID, try fetching the TLE directly from Celestrak, but be aware of rate limits so we don't get blocked
 	if (!tleData) {
-		log.verbose(`NORAD ID ${noradId} not found in active group. Attempting to fetch directly from Celestrak...`);
+		log.debug(`NORAD ID ${noradId} not found in active group. Attempting to fetch directly from Celestrak...`);
 		const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${noradId}&FORMAT=tle`;
 		try {
 			let tries: number = (await kv.get(`celestrakTries`)) || 0;
@@ -71,7 +71,7 @@ async function getObjectsTle(noradId: number) {
 			});
 
 			if (!response.ok) {
-				log.error(`Failed to fetch TLE from Celestrak: ${response.status} ${response.statusText}`);
+				log.child({ status: response.status, statusText: response.statusText }).error(`Failed to fetch TLE for NORAD ID ${noradId} from Celestrak`);
 				throw new Error(`Failed to fetch TLE from Celestrak`);
 			}
 
@@ -79,9 +79,13 @@ async function getObjectsTle(noradId: number) {
 			await kv.set(`tle_${noradId}`, tleData);
 			await kv.set(`celestrakTries`, tries + 1);
 			await kv.set(`celestrakLastTry`, Date.now());
-			log.info(`Successfully fetched TLE for NORAD ID ${noradId} from Celestrak.`);
+			log.debug(`Successfully fetched TLE for NORAD ID ${noradId} from Celestrak.`);
 		} catch (error) {
-			log.error(`Error fetching TLE for NORAD ID ${noradId}: ${error}`);
+			if (error instanceof Error) {
+				log.child(error).error(`Error fetching TLE for NORAD ID ${noradId}:`);
+			} else {
+				log.error(`Error fetching TLE for NORAD ID ${noradId}: ${error}`);
+			}
 			throw error;
 		}
 	}

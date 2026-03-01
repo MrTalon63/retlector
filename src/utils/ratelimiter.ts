@@ -23,7 +23,7 @@ const limiter = new Elysia({ name: "rate-limiter" }).onRequest(async (ctx) => {
 		if (now - clientInfo.startTime < windowSize) {
 			clientInfo.count++;
 			if (clientInfo.count > maxRequests) {
-				log.info(`Rate limit exceeded for IP ${ip}`);
+				log.debug(`Rate limit exceeded for IP ${ip}`);
 				return new Response("Too Many Requests", {
 					status: 429,
 					headers: {

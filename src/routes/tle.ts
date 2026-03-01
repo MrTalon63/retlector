@@ -24,26 +24,26 @@ const tleRoute = new Elysia({ prefix: "/tle" })
 		const lastFetchedHeader = new Date(ctx.request.headers.get("If-Modified-Since") || 0).getTime();
 
 		if (lastFetchedHeader && timestamp && lastFetchedHeader <= timestamp && !isStale) {
-			log.info(`TLEs for group "${group}" not modified since last fetch. Returning 304.`);
+			log.debug(`TLEs for group "${group}" not modified since last fetch. Returning 304.`);
 			return new Response(null, { status: 304, headers: { "Last-Modified": new Date(timestamp).toUTCString(), "Cache-Control": `max-age=${group === "active" ? Math.ceil((config.cacheActiveDuration - (now - timestamp)) / 1000) : Math.ceil((config.cacheDuration - (now - timestamp)) / 1000)}` } });
 		}
 
 		let tle = await kv.get(group);
 
 		if (!tle) {
-			log.info(`No cached TLEs for group "${group}". Fetching from Celestrak...`);
+			log.debug(`No cached TLEs for group "${group}". Fetching from Celestrak...`);
 			tle = await tleFetcher(group);
 			timestamp = now;
 			kv.set(group, tle);
 			kv.set(`${group}_timestamp`, timestamp);
 		} else if (isStale) {
-			log.info(`TLEs for group "${group}" are stale. Fetching fresh TLEs...`);
+			log.debug(`TLEs for group "${group}" are stale. Fetching fresh TLEs...`);
 			tle = await tleFetcher(group);
 			timestamp = now;
 			kv.set(group, tle);
 			kv.set(`${group}_timestamp`, timestamp);
 		} else {
-			log.info(`Serving cached TLEs for group "${group}".`);
+			log.debug(`Serving cached TLEs for group "${group}".`);
 		}
 
 		return new Response(tle, {
