@@ -1,4 +1,4 @@
-const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow }: { activeGroups: { name: string; lastUpdate: string }[]; cacheDuration: number; maxReq: number; maxReqWindow: number }) => (
+const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow }: { activeGroups: { name: string; lastUpdateTle: string; lastUpdateJson: string }[]; cacheDuration: number; maxReq: number; maxReqWindow: number }) => (
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8" />
@@ -23,31 +23,34 @@ const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow }: { activeGr
 		</head>
 		<body>
 			<h1>Welcome to ReTLEctor</h1>
+			<p>This is a simple web app to cache and return TLEs from Celestrak, so you can avoid getting blocked by their servers when you need to get TLEs for a large number of satellites (Or you testing shit).</p>
+
 			<p>
-				This is a simple web app to cache and return TLEs from Celestrak, so you can avoid getting blocked by their servers when you need to get TLEs for a large number of satellites (Or you testing shit).
-				<br />
+				Currently supported formats are <strong>3LE</strong> under <code>/tle/[group]</code> and <strong>JSON CCSDS OMM</strong> under <code>/json/[group]</code>
 			</p>
 
-			<br />
+			<p>
+				Custom NORAD ID requests are supported via <code>/norad/[NORAD_ID]</code>.<br></br>
+				Please note that this is very experimental and currently only in <strong>3LE</strong> format.
+			</p>
 
 			<h3>Table below represents the cached TLEs and their URIs as well as last update time:</h3>
 
 			<table>
 				<tr>
-					<th>TLE</th>
-					<th>URI</th>
-					<th>Last Update</th>
+					<th>TLE (group)</th>
+					<th>Last Update (TLE)</th>
+					<th>Last Update (JSON)</th>
 				</tr>
 				{activeGroups.map((group) => (
 					<tr>
 						<td>{group.name}</td>
-						<td>/tle/{group.name}</td>
-						<td>{group.lastUpdate}</td>
+						<td>{group.lastUpdateTle}</td>
+						<td>{group.lastUpdateJson}</td>
 					</tr>
 				))}
 			</table>
 
-			<p>Support for custom NORAD IDs will be added soon-ish.</p>
 			<p>Data is updated every ~{cacheDuration / 1000 / 60} minutes.</p>
 			<p>
 				Current rate limit is {maxReq} requests per {maxReqWindow / 1000} seconds. That might change in the future, pay attention to the headers returned by the server.
