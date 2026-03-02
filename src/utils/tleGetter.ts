@@ -13,11 +13,11 @@ async function getObjectsTle(noradId: number) {
 	const isStale = timestamp ? now - timestamp > config.cacheNoradDuration : true;
 
 	if (!tleData || isStale) {
-		let allTles = (await kv.get("active")) as string | null;
+		let allTles = (await kv.get("active_tle")) as string | null;
 		if (!allTles) {
 			await fetchTle("active");
 		}
-		allTles = (await kv.get("active")) as string | null;
+		allTles = (await kv.get("active_tle")) as string | null;
 
 		// If we still don't have the active TLEs then something went wrong with fetching, so we throw an error
 		if (!allTles) {

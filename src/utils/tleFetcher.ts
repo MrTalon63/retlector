@@ -7,7 +7,7 @@ async function fetchTle(group: string) {
 	const url = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${group}&FORMAT=tle`;
 	log.debug(`Fetching TLEs for group "${group}" from Celestrak...`);
 	try {
-		const lastFetch = await kv.get(`${group}_timestamp`);
+		const lastFetch = await kv.get(`${group}_timestamp_tle`);
 		const response = await fetch(url, {
 			headers: {
 				"If-Modified-Since": lastFetch ? new Date(lastFetch).toUTCString() : "",
@@ -18,8 +18,8 @@ async function fetchTle(group: string) {
 			throw new Error(`Failed to fetch TLEs: ${response.status} ${response.statusText}`);
 		}
 		const tleData = await response.text();
-		await kv.set(group, tleData);
-		await kv.set(`${group}_timestamp`, Date.now());
+		await kv.set(`${group}_tle`, tleData);
+		await kv.set(`${group}_timestamp_tle`, Date.now());
 		log.debug(`Successfully cached TLEs for group "${group}".`);
 		return tleData;
 	} catch (error) {

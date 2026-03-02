@@ -20,7 +20,7 @@ new Elysia()
 	.get("/", async () => {
 		const activeGroups = [];
 		for (const group of config.allowedGroups) {
-			const timestamp = await kv.get(`${group}_timestamp`);
+			const timestamp = await kv.get(`${group}_timestamp_tle`);
 			const lastUpdate = timestamp ? new Date(timestamp).toISOString() : "Never";
 			activeGroups.push({ name: group, lastUpdate });
 		}

@@ -17,7 +17,7 @@ const tleRoute = new Elysia({ prefix: "/tle" })
 			return new Response(`Group "${group}" is not allowed.`, { status: 403 });
 		}
 
-		let timestamp = await kv.get(`${group}_timestamp`);
+		let timestamp = await kv.get(`${group}_timestamp_tle`);
 		const now = Date.now();
 		const staleDuration = group === "active" ? config.cacheActiveDuration : config.cacheDuration;
 		const isStale = timestamp ? now - timestamp > staleDuration : true;
@@ -28,20 +28,20 @@ const tleRoute = new Elysia({ prefix: "/tle" })
 			return new Response(null, { status: 304, headers: { "Last-Modified": new Date(timestamp).toUTCString(), "Cache-Control": `max-age=${group === "active" ? Math.ceil((config.cacheActiveDuration - (now - timestamp)) / 1000) : Math.ceil((config.cacheDuration - (now - timestamp)) / 1000)}` } });
 		}
 
-		let tle = await kv.get(group);
+		let tle = await kv.get(`${group}_tle`);
 
 		if (!tle) {
 			log.debug(`No cached TLEs for group "${group}". Fetching from Celestrak...`);
 			tle = await tleFetcher(group);
 			timestamp = now;
-			kv.set(group, tle);
-			kv.set(`${group}_timestamp`, timestamp);
+			kv.set(`${group}_tle`, tle);
+			kv.set(`${group}_timestamp_tle`, timestamp);
 		} else if (isStale) {
 			log.debug(`TLEs for group "${group}" are stale. Fetching fresh TLEs...`);
 			tle = await tleFetcher(group);
 			timestamp = now;
-			kv.set(group, tle);
-			kv.set(`${group}_timestamp`, timestamp);
+			kv.set(`${group}_tle`, tle);
+			kv.set(`${group}_timestamp_tle`, timestamp);
 		} else {
 			log.debug(`Serving cached TLEs for group "${group}".`);
 		}
@@ -56,7 +56,7 @@ const tleRoute = new Elysia({ prefix: "/tle" })
 			return new Response(`Group "${group}" is not allowed.`, { status: 403 });
 		}
 
-		const timestamp = await kv.get(`${group}_timestamp`);
+		const timestamp = await kv.get(`${group}_timestamp_tle`);
 		if (!timestamp) {
 			return new Response(`No cached TLEs for group "${group}".`, { status: 404 });
 		}
