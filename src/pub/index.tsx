@@ -1,4 +1,4 @@
-const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: { activeGroups: { name: string; lastUpdateTle: string; lastUpdateJson: string }[]; cacheDuration: number; maxReq: number; maxReqWindow: number; version: string }) => (
+const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: { activeGroups: { name: string; lastUpdateTle: string; lastUpdateJson: string; lastUpdateCsv: string }[]; cacheDuration: number; maxReq: number; maxReqWindow: number; version: string }) => (
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8" />
@@ -26,7 +26,7 @@ const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: {
 			<p>This is a simple web app to cache and return TLEs from Celestrak, so you can avoid getting blocked by their servers when you need to get TLEs for a large number of satellites (Or you testing shit).</p>
 
 			<p>
-				Currently supported formats are <strong>3LE</strong> under <code>/tle/[group]</code> and <strong>JSON CCSDS OMM</strong> under <code>/json/[group]</code>
+				Currently supported formats are <strong>3LE</strong> under <code>/tle/[group]</code>, <strong>JSON CCSDS OMM</strong> under <code>/json/[group]</code>, and <strong>CSV</strong> under <code>/csv/[group]</code>
 			</p>
 
 			<p>
@@ -41,12 +41,14 @@ const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: {
 					<th>TLE (group)</th>
 					<th>Last Update (TLE)</th>
 					<th>Last Update (JSON)</th>
+					<th>Last Update (CSV)</th>
 				</tr>
 				{activeGroups.map((group) => (
 					<tr>
 						<td>{group.name}</td>
 						<td>{group.lastUpdateTle}</td>
 						<td>{group.lastUpdateJson}</td>
+						<td>{group.lastUpdateCsv}</td>
 					</tr>
 				))}
 			</table>
