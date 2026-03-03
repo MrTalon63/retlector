@@ -14,33 +14,58 @@ async function getObjectsTle(noradId: number) {
 
 	if (!tleData || isStale) {
 		let allTles = (await kv.get("active_tle")) as string | null;
-		if (!allTles) {
+		const activeTimestamp: number | undefined = await kv.get("active_timestamp_tle");
+		const activeIsStale = activeTimestamp ? now - activeTimestamp > config.cacheActiveDuration : true;
+
+		if (!allTles || activeIsStale) {
+			// Active group is missing or stale — fetch fresh data and re-cache all satellites
 			await fetchTle("active");
-		}
-		allTles = (await kv.get("active_tle")) as string | null;
+			allTles = (await kv.get("active_tle")) as string | null;
 
-		// If we still don't have the active TLEs then something went wrong with fetching, so we throw an error
-		if (!allTles) {
-			log.error("Failed to fetch active TLEs from Celestrak");
-			throw new Error("Failed to fetch active TLEs from Celestrak");
-		}
-		const lines = allTles.split("\n");
-		const setPromises: Promise<boolean>[] = [];
-		for (let i = 0; i < lines.length; i += 3) {
-			const idLine = lines[i + 0];
-			const tleLine1 = lines[i + 1];
-			const tleLine2 = lines[i + 2];
+			// If we still don't have the active TLEs then something went wrong with fetching, so we throw an error
+			if (!allTles) {
+				log.error("Failed to fetch active TLEs from Celestrak");
+				throw new Error("Failed to fetch active TLEs from Celestrak");
+			}
 
-			if (idLine && tleLine1 && tleLine2) {
-				const parsed = tle.parse(`${idLine}\n${tleLine1}\n${tleLine2}`);
-				const tleString = `${idLine}\n${tleLine1}\n${tleLine2}`;
-				if (parsed.number === noradId) {
-					tleData = tleString;
+			const lines = allTles.split("\n");
+			const setPromises: Promise<boolean>[] = [];
+			for (let i = 0; i < lines.length; i += 3) {
+				const idLine = lines[i + 0];
+				const tleLine1 = lines[i + 1];
+				const tleLine2 = lines[i + 2];
+
+				if (idLine && tleLine1 && tleLine2) {
+					const parsed = tle.parse(`${idLine}\n${tleLine1}\n${tleLine2}`);
+					const tleString = `${idLine}\n${tleLine1}\n${tleLine2}`;
+					if (parsed.number === noradId) {
+						tleData = tleString;
+					}
+					setPromises.push(kv.set(`tle_${parsed.number}`, tleString));
+					setPromises.push(kv.set(`tle_${parsed.number}_timestamp`, now));
 				}
-				setPromises.push(kv.set(`tle_${parsed.number}`, tleString));
+			}
+			await Promise.all(setPromises);
+		} else {
+			// Active group is still fresh — just scan for the requested satellite without re-writing everything
+			log.debug(`Active TLE group is fresh. Scanning for NORAD ID ${noradId} without re-caching all satellites.`);
+			const lines = allTles.split("\n");
+			for (let i = 0; i < lines.length; i += 3) {
+				const idLine = lines[i + 0];
+				const tleLine1 = lines[i + 1];
+				const tleLine2 = lines[i + 2];
+
+				if (idLine && tleLine1 && tleLine2) {
+					const parsed = tle.parse(`${idLine}\n${tleLine1}\n${tleLine2}`);
+					if (parsed.number === noradId) {
+						tleData = `${idLine}\n${tleLine1}\n${tleLine2}`;
+						await kv.set(`tle_${noradId}`, tleData);
+						await kv.set(`tle_${noradId}_timestamp`, now);
+						break;
+					}
+				}
 			}
 		}
-		await Promise.all(setPromises);
 	}
 
 	// If we're here then active group doesn't contain the requested NORAD ID, try fetching the TLE directly from Celestrak, but be aware of rate limits so we don't get blocked
@@ -77,6 +102,7 @@ async function getObjectsTle(noradId: number) {
 
 			tleData = (await response.text()) as string;
 			await kv.set(`tle_${noradId}`, tleData);
+			await kv.set(`tle_${noradId}_timestamp`, Date.now());
 			await kv.set(`celestrakTries`, tries + 1);
 			await kv.set(`celestrakLastTry`, Date.now());
 			log.debug(`Successfully fetched TLE for NORAD ID ${noradId} from Celestrak.`);

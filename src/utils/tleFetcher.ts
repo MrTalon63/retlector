@@ -14,10 +14,20 @@ async function fetchTle(group: string, format: "tle" | "json" | "csv" = "tle"): 
 				"User-Agent": `ReTLEctor/${version} (https://github.com/MrTalon63/ReTLEctor)`,
 			},
 		});
+
+		if (response.status === 304) {
+			const cached = (await kv.get(`${group}_${format}`)) as string | null;
+			if (cached) {
+				log.debug(`Celestrak returned 304 for group "${group}", format "${format}". Serving cached data.`);
+				return cached;
+			}
+			throw new Error(`Celestrak returned 304 but no cached data exists for group "${group}", format "${format}"`);
+		}
 		if (!response.ok) {
 			throw new Error(`Failed to fetch TLEs: ${response.status} ${response.statusText}`);
 		}
 		const tleData = await response.text();
+
 		await kv.set(`${group}_${format}`, tleData);
 		await kv.set(`${group}_timestamp_${format}`, Date.now());
 		log.debug(`Successfully cached TLEs for group "${group}" in format "${format}".`);

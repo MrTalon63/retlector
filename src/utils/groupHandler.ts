@@ -24,14 +24,14 @@ async function handleGroupRequest(group: string, lastFetchedHeader: number, form
 		log.debug(`No cached GP data for group "${group}", format "${format}". Fetching from Celestrak...`);
 		tle = await tleFetcher(group, format);
 		timestamp = now;
-		kv.set(`${group}_${format}`, tle);
-		kv.set(`${group}_timestamp_${format}`, timestamp);
+		await kv.set(`${group}_${format}`, tle);
+		await kv.set(`${group}_timestamp_${format}`, timestamp);
 	} else if (isStale) {
 		log.debug(`GP data for group "${group}", format "${format}" are stale. Fetching fresh TLEs...`);
 		tle = await tleFetcher(group, format);
 		timestamp = now;
-		kv.set(`${group}_${format}`, tle);
-		kv.set(`${group}_timestamp_${format}`, timestamp);
+		await kv.set(`${group}_${format}`, tle);
+		await kv.set(`${group}_timestamp_${format}`, timestamp);
 	} else {
 		log.debug(`Serving cached GP data for group "${group}", format "${format}".`);
 	}
