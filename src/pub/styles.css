@@ -38,6 +38,7 @@ header {
 	justify-content: space-between;
 	gap: 16px;
 	max-width: 900px;
+	margin: 0 auto;
 }
 
 .header-gh {
