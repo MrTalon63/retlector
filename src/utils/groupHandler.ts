@@ -22,7 +22,7 @@ async function handleGroupRequest(group: string, lastFetchedHeader: number, form
 
 	if (!tle) {
 		log.debug(`No cached GP data for group "${group}", format "${format}". Fetching from Celestrak...`);
-		tle = await tleFetcher(group);
+		tle = await tleFetcher(group, format);
 		timestamp = now;
 		kv.set(`${group}_${format}`, tle);
 		kv.set(`${group}_timestamp_${format}`, timestamp);
