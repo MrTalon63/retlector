@@ -12,11 +12,11 @@ const tleRoute = new Elysia({ prefix: "/csv" })
 	.get("/:group", async (ctx) => {
 		const group = ctx.params.group;
 		const lastFetchedHeader = new Date(ctx.request.headers.get("If-Modified-Since") || 0).getTime();
-		return await groupHandler.handleGroupRequest(group, lastFetchedHeader, "tle");
+		return await groupHandler.handleGroupRequest(group, lastFetchedHeader, "csv");
 	})
 	.get("/:group/status", async (ctx) => {
 		const group = ctx.params.group;
-		return await groupHandler.handleGroupStatus(group, "tle");
+		return await groupHandler.handleGroupStatus(group, "csv");
 	});
 
 export default tleRoute;
