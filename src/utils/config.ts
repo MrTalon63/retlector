@@ -1,5 +1,5 @@
 const config = {
-	allowedGroups: process.env.ALLOWED_GROUPS ? process.env.ALLOWED_GROUPS.split(",").concat("active") : ["active"],
+	allowedGroups: process.env.ALLOWED_GROUPS ? process.env.ALLOWED_GROUPS.split(",").splice(0, 0, "active") : ["active"],
 	logLevel: process.env.LOG_LEVEL || "info",
 	port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
 	redisUri: process.env.REDIS_URI || null,
