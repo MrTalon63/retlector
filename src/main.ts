@@ -4,6 +4,7 @@ import { wrap } from "@bogeychan/elysia-logger";
 
 import tleRoute from "./routes/tle";
 import jsonRoute from "./routes/json";
+import csvRoute from "./routes/csv";
 import noradRoute from "./routes/norad";
 
 import index from "./pub/index.tsx";
@@ -24,9 +25,11 @@ new Elysia()
 		for (const group of config.allowedGroups) {
 			const tleTimestamp = await kv.get(`${group}_timestamp_tle`);
 			const jsonTimestamp = await kv.get(`${group}_timestamp_json`);
+			const csvTimestamp = await kv.get(`${group}_timestamp_csv`);
 			const lastUpdateTle = tleTimestamp ? new Date(tleTimestamp).toISOString() : "Never";
 			const lastUpdateJson = jsonTimestamp ? new Date(jsonTimestamp).toISOString() : "Never";
-			activeGroups.push({ name: group, lastUpdateTle, lastUpdateJson });
+			const lastUpdateCsv = csvTimestamp ? new Date(csvTimestamp).toISOString() : "Never";
+			activeGroups.push({ name: group, lastUpdateTle, lastUpdateJson, lastUpdateCsv });
 		}
 		return index({ activeGroups, cacheDuration: config.cacheDuration, maxReq: config.rateLimitMaxRequests, maxReqWindow: config.rateLimitWindow, version });
 	})
@@ -34,6 +37,7 @@ new Elysia()
 	// Subroutes registers
 	.use(tleRoute) // Import TLE routes
 	.use(jsonRoute) // Import JSON routes
+	.use(csvRoute) // Import CSV routes
 	.use(noradRoute) // Import NORAD routes
 
 	.listen(config.port, () => {

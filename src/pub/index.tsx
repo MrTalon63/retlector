@@ -1,4 +1,4 @@
-const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: { activeGroups: { name: string; lastUpdateTle: string; lastUpdateJson: string }[]; cacheDuration: number; maxReq: number; maxReqWindow: number; version: string }) => (
+const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: { activeGroups: { name: string; lastUpdateTle: string; lastUpdateJson: string; lastUpdateCsv: string }[]; cacheDuration: number; maxReq: number; maxReqWindow: number; version: string }) => (
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8" />
@@ -22,47 +22,70 @@ const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: {
 			<link rel="stylesheet" href="/styles.css" />
 		</head>
 		<body>
-			<h1>Welcome to ReTLEctor</h1>
-			<p>This is a simple web app to cache and return TLEs from Celestrak, so you can avoid getting blocked by their servers when you need to get TLEs for a large number of satellites (Or you testing shit).</p>
+			<header>
+				<div class="header-inner">
+					<div>
+						<h1>ReTLEctor</h1>
+						<p>Celestrak TLE caching proxy - v{version}</p>
+					</div>
+					<a class="header-gh" href="https://github.com/MrTalon63/ReTLEctor" target="_blank">
+						GitHub repository
+					</a>
+				</div>
+			</header>
+			<main>
+				<div class="card">
+					<h2>About</h2>
+					<p>A lightweight proxy that caches TLEs from Celestrak to prevent rate-limiting when fetching a lot of data.</p>
+					<p>
+						Supported formats: <br />
+						<strong>3LE</strong> - <code>/tle/[group]</code> <br />
+						<strong>JSON CCSDS OMM</strong> - <code>/json/[group]</code> <br />
+						<strong>CSV</strong> - <code>/csv/[group]</code>
+					</p>
+					<p>
+						Custom NORAD ID lookup (experimental, 3LE only): <code>/norad/[NORAD_ID]</code>
+					</p>
+				</div>
 
-			<p>
-				Currently supported formats are <strong>3LE</strong> under <code>/tle/[group]</code> and <strong>JSON CCSDS OMM</strong> under <code>/json/[group]</code>
-			</p>
+				<div class="card table-card">
+					<h2>Cached Groups</h2>
+					<div class="table-wrap">
+						<table>
+							<thead>
+								<tr>
+									<th>Group</th>
+									<th>Last Update (TLE)</th>
+									<th>Last Update (JSON)</th>
+									<th>Last Update (CSV)</th>
+								</tr>
+							</thead>
+							<tbody>
+								{activeGroups.map((group) => (
+									<tr>
+										<td data-label="Group">
+											<code>{group.name}</code>
+										</td>
+										<td data-label="Last Update (TLE)">{group.lastUpdateTle}</td>
+										<td data-label="Last Update (JSON)">{group.lastUpdateJson}</td>
+										<td data-label="Last Update (CSV)">{group.lastUpdateCsv}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
 
-			<p>
-				Custom NORAD ID requests are supported via <code>/norad/[NORAD_ID]</code>.<br />
-				Please note that this is very experimental and currently only in <strong>3LE</strong> format.
-			</p>
-
-			<h3>Table below represents the cached TLEs and their URIs as well as last update time:</h3>
-
-			<table>
-				<tr>
-					<th>TLE (group)</th>
-					<th>Last Update (TLE)</th>
-					<th>Last Update (JSON)</th>
-				</tr>
-				{activeGroups.map((group) => (
-					<tr>
-						<td>{group.name}</td>
-						<td>{group.lastUpdateTle}</td>
-						<td>{group.lastUpdateJson}</td>
-					</tr>
-				))}
-			</table>
-
-			<p>Data is updated every ~{cacheDuration / 1000 / 60} minutes.</p>
-			<p>
-				Current rate limit is {maxReq} requests per {maxReqWindow / 1000} seconds. That might change in the future, pay attention to the headers returned by the server.
-			</p>
-			<p>
-				Source code is available on{" "}
-				<a href="https://github.com/MrTalon63/retlector" target="_blank">
-					GitHub
+				<div class="meta">
+					<span>Cache refresh: ~{cacheDuration / 1000 / 60} min</span>
+					<span>
+						Rate limit: {maxReq} req / {maxReqWindow / 1000}s (Follow http headers for accurate rate limit info)
+					</span>
+				</div>
+				<a class="btn" href="https://github.com/MrTalon63/ReTLEctor" target="_blank">
+					View Source on GitHub
 				</a>
-				. Feel free to contribute!
-			</p>
-			<p>ReTLEctor version: {version}</p>
+			</main>
 		</body>
 	</html>
 );
