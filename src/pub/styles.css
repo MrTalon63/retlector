@@ -38,21 +38,24 @@ header {
 	justify-content: space-between;
 	gap: 16px;
 	max-width: 900px;
+	width: 100%;
+	margin: 0 auto;
 }
 
 .header-gh {
 	color: #fff;
-	border: 1px solid rgba(255,255,255,.4);
+	border: 1px solid rgba(255, 255, 255, 0.4);
 	border-radius: var(--radius);
 	padding: 6px 14px;
-	font-size: .88rem;
+	font-size: 0.88rem;
 	font-weight: 600;
 	text-decoration: none !important;
 	white-space: nowrap;
-	transition: background .15s;
+	transition: background 0.15s;
+	margin-left: auto;
 }
 .header-gh:hover {
-	background: rgba(255,255,255,.15);
+	background: rgba(255, 255, 255, 0.15);
 	text-decoration: none;
 }
 

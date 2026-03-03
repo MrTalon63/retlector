@@ -28,7 +28,7 @@ const index = ({ activeGroups, cacheDuration, maxReq, maxReqWindow, version }: {
 						<h1>ReTLEctor</h1>
 						<p>Celestrak TLE caching proxy - v{version}</p>
 					</div>
-					<a class="header-gh" href="https://github.com/MrTalon63/ReTLEctor" target="_blank">
+					<a class="header-gh btn" href="https://github.com/MrTalon63/ReTLEctor" target="_blank">
 						GitHub repository
 					</a>
 				</div>
